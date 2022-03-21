@@ -245,6 +245,7 @@ isa_t::getClass(MAYBE_UNUSED_AUTHENTICATED_PARAM bool authenticated) {
 #       endif
 
 #   else
+    uintptr_t t = ISA_MASK;
     clsbits &= ISA_MASK;
 #   endif
 

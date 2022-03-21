@@ -15,6 +15,8 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <objc/runtime.h>
+#import "FGModel.h"
 
 
 struct Student {
@@ -52,6 +54,11 @@ int main(int argc, const char * argv[]) {
     @autoreleasepool {
         NSLog(@"Hello, KCObjcBuild!");
         NSObject *objc = [NSObject alloc];
+        [objc class];
+        
+        FGModel *model = [[FGModel alloc] init];
+        Class cls = object_getClass(model);
+        //0x00007ffffffffff8ULL
         NSLog(@"开心调试 %@ 底层源码",objc);
     }
     return 0;
