@@ -9,4 +9,8 @@
 
 @implementation FGModel
 
+-(void)something {
+    NSLog(@"something");
+}
+
 @end

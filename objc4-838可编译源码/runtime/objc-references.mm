@@ -37,8 +37,8 @@ enum {
     OBJC_ASSOCIATION_SETTER_RETAIN      = 1,
     OBJC_ASSOCIATION_SETTER_COPY        = 3,            // NOTE:  both bits are set, so we can simply test 1 bit in releaseValue below.
     OBJC_ASSOCIATION_GETTER_READ        = (0 << 8),
-    OBJC_ASSOCIATION_GETTER_RETAIN      = (1 << 8),
-    OBJC_ASSOCIATION_GETTER_AUTORELEASE = (2 << 8),
+    OBJC_ASSOCIATION_GETTER_RETAIN      = (1 << 8),// 对应ATOMIC
+    OBJC_ASSOCIATION_GETTER_AUTORELEASE = (2 << 8),// 对应ATOMIC
     OBJC_ASSOCIATION_SYSTEM_OBJECT      = _OBJC_ASSOCIATION_SYSTEM_OBJECT, // 1 << 16
 };
 
@@ -152,7 +152,7 @@ _object_get_associative_reference(id object, const void *key)
             }
         }
     }
-
+    //对于 OBJC_ASSOCIATION_RETAIN ，先在retainReturnedValue里面retain，然后autoreleaseReturnedValue里面autorelease
     return association.autoreleaseReturnedValue();
 }
 
@@ -177,29 +177,28 @@ _object_set_associative_reference(id object, const void *key, id value, uintptr_
     {
         AssociationsManager manager;
         AssociationsHashMap &associations(manager.get());
-
+        //associations是<object, ObjectAssociationMap>的集合
         if (value) {
             auto refs_result = associations.try_emplace(disguised, ObjectAssociationMap{});
-            if (refs_result.second) {
+            if (refs_result.second) {// 当object不存在时会创建新的
                 /* it's the first association we make */
                 isFirstAssociation = true;
             }
-
             /* establish or replace the association */
             auto &refs = refs_result.first->second;
             auto result = refs.try_emplace(key, std::move(association));
-            if (!result.second) {
+            if (!result.second) {// 为false则表明key对应的存在，否则不存在,result.first->first是key，result.first->second是ObjcAssociation
                 association.swap(result.first->second);
             }
-        } else {
-            auto refs_it = associations.find(disguised);
+        } else { // 为nil则表示移除
+            auto refs_it = associations.find(disguised);// refs_it->first 是object的disguise，second是<key,ObjcAssociation>的集合
             if (refs_it != associations.end()) {
-                auto &refs = refs_it->second;
-                auto it = refs.find(key);
+                auto &refs = refs_it->second;//必须用&refs来进行读取
+                auto it = refs.find(key);// it->first 是key，it->second 是ObjcAssociation
                 if (it != refs.end()) {
                     association.swap(it->second);
-                    refs.erase(it);
-                    if (refs.size() == 0) {
+                    refs.erase(it);// 移除该key对应的关联对象
+                    if (refs.size() == 0) {//该object没有关联对象了，进行删除
                         associations.erase(refs_it);
 
                     }

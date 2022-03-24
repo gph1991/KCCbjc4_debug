@@ -17,6 +17,42 @@
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 #import "FGModel.h"
+#import "FGModel+Tool.h"
+
+
+void testBit(void);
+
+
+int main(int argc, const char * argv[]) {
+    testBit();
+
+    @autoreleasepool {
+        NSLog(@"Hello, KCObjcBuild!");
+        NSObject *objc = [[NSObject alloc] init];
+        [objc class];
+        
+        FGModel *model = [[FGModel alloc] init];
+        objc.obj = model;
+        
+        FGModel *model2 = [[FGModel alloc] init];
+        objc.obj = model2;
+
+        FGModel *model3 = objc.obj;
+//        objc.obj = nil;
+        
+        __weak typeof(model) wmodel = model;//objc_initWeak
+        [model something];
+        Class cls = object_getClass(model);
+        //0x0000000ffffffff8ULL
+        // 0x0001 0111 0000 0011 1101 1000 0111 0111
+        NSLog(@"开心调试 %@ 底层源码",objc);
+    }
+    
+    // 1 0000 0000 0000 0000 1000 0000 1100 1000
+    // 0x1000080c8
+    return 0;
+}
+
 
 
 struct Student {
@@ -46,21 +82,3 @@ void testBit(void) {
     printf("%p",&stu);
     //stu的值: 9f 0a
 }
-
-
-int main(int argc, const char * argv[]) {
-    testBit();
-
-    @autoreleasepool {
-        NSLog(@"Hello, KCObjcBuild!");
-        NSObject *objc = [NSObject alloc];
-        [objc class];
-        
-        FGModel *model = [[FGModel alloc] init];
-        Class cls = object_getClass(model);
-        //0x00007ffffffffff8ULL
-        NSLog(@"开心调试 %@ 底层源码",objc);
-    }
-    return 0;
-}
-
