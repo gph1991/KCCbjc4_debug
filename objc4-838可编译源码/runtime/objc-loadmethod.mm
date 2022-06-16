@@ -80,7 +80,7 @@ void add_class_to_loadable_list(Class cls)
                               loadable_classes_allocated *
                               sizeof(struct loadable_class));
     }
-    
+    // super的load位置0，子类的load位置1
     loadable_classes[loadable_classes_used].cls = cls;
     loadable_classes[loadable_classes_used].method = method;
     loadable_classes_used++;

@@ -656,7 +656,7 @@ public:
 #if PROTECT_AUTORELEASEPOOL
 		PAGE_MAX_SIZE;  // must be multiple of vm page size
 #else
-		PAGE_MIN_SIZE;  // size and alignment, power of 2
+		PAGE_MIN_SIZE;  // size and alignment, power of 2 // 4096
 #endif
     
 private:
@@ -795,6 +795,9 @@ private:
 
     id * begin() {
         return (id *) ((uint8_t *)this+sizeof(*this));
+        /*
+         sizeof(*this)=56，总的大小为4096，减去结构体剩余4040，减去初次插入的boundary（2个），剩余4028，一页能存储503个对象。
+        */
     }
 
     id * end() {
@@ -805,7 +808,7 @@ private:
         return next == begin();
     }
 
-    bool full() { 
+    bool full() {
         return next == end();
     }
 
@@ -815,6 +818,10 @@ private:
 
     id *add(id obj)
     {
+        void *p1 = begin();
+        void *p2 = next;
+        void *p3 = end();
+
         ASSERT(!full());
         unprotect();
         id *ret;
@@ -1086,12 +1093,15 @@ private:
             // Install and return the empty pool placeholder.
             return setEmptyPoolPlaceholder();
         }
+        // 0 EMPTY_POOL_PLACEHOLDER
+        // 1 POOL_BOUNDARY
+        // 2 obj
 
         // We are pushing an object or a non-placeholder'd pool.
 
         // Install the first page.
         AutoreleasePoolPage *page = new AutoreleasePoolPage(nil);
-        setHotPage(page);
+        setHotPage(page); // 设置过后hotpage后，haveEmptyPoolPlaceholder就为false。因为tls用的同一个key
         
         // Push a boundary on behalf of the previously-placeholder'd pool.
         if (pushExtraBoundary) {
@@ -1124,7 +1134,7 @@ public:
         return obj;
     }
 
-
+    // @autorelease{} 这种，会先执行objc_autoreleasePoolPush->push()，插入一个POOL_BOUNDARY，等到出作用域了执行objc_autoreleasePoolPop->pop(token),token即push()的返回值。从当前往上回溯，在token之间的对象都执行一次release。
     static inline void *push() 
     {
         id *dest;

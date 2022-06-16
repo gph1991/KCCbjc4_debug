@@ -482,6 +482,9 @@ map_images_nolock(unsigned mhCount, const char * const mhPaths[],
     {
         uint32_t i = mhCount;
         while (i--) {
+            if (i == 1) {
+                printf("%d,%s\n", i, mhPaths[i]);
+            }
             const headerType *mhdr = (const headerType *)mhdrs[i];
 
             auto hi = addHeader(mhdr, mhPaths[i], totalClasses, unoptimizedTotalClasses);

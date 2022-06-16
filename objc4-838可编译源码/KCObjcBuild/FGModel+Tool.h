@@ -11,18 +11,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 // AutoreleasePool
 /*
- 1，AssociationsManager 有个get函数返回了一个静态的Storage属性，Storage是ExplicitInitDenseMap<DisguisedPtr<objc_object>, ObjectAssociationMap>的别名，即提供了object对象到ObjectAssociationMap的映射
+ 1，AssociationsManager 有个get函数返回了一个静态的Storage变量，Storage是AssociationsHashMap，<DisguisedPtr<objc_object>, ObjectAssociationMap>的别名，即提供了object对象到ObjectAssociationMap的映射
  2，ObjectAssociationMap是DenseMap<const void *, ObjcAssociation>的别名，即提供了指针（key）到ObjcAssociation的映射
  3，class ObjcAssociation的定义有，uintptr_t _policy和id _value;即策略和value。
  
- 
- 
  */
+
 // Weak
 // Association
-// RunLoop
+// AutoreleasePage
 // KVO/KVC
 // Zombie
+// RunLoop
+// dispatch_once
+// @synchronized(),objc_sync_enter
 
 @interface NSObject (Tool)
 

@@ -10,6 +10,15 @@
 
 @implementation NSObject (Tool)
 
++(void)load {
+    
+}
+
+//+(void)initialize {
+    // 类里面的initialize会被category的initialize覆盖，因为initialize是objc_msgSend方式调用的。
+    // load不会被category的load覆盖，因为是从mach-o里面取出method，然后直接调用的，没有消息发送的流程
+//}
+
 /*
     OBJC_ASSOCIATION_ASSIGN = 0,
     OBJC_ASSOCIATION_RETAIN_NONATOMIC = 1,
@@ -30,8 +39,11 @@
 
 @end
 
-//@implementation FGModel (Tool)
-//
-//
-//
-//@end
+@implementation FGModel (Tool)
+
++(void)initialize {
+    // 类里面的initialize会被category的initialize覆盖，因为initialize是objc_msgSend方式调用的。
+    // load不会被category的load覆盖，因为是从mach-o里面取出method，然后直接调用的，没有消息发送的流程
+}
+
+@end

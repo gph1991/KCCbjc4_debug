@@ -1494,7 +1494,9 @@ static void methodizeClass(Class cls, Class previously)
     method_list_t *list = ro->baseMethods;
     if (list) {
         prepareMethodLists(cls, &list, 1, YES, isBundleClass(cls), nullptr);
-        if (rwe) rwe->methods.attachLists(&list, 1);
+        if (rwe) {
+            rwe->methods.attachLists(&list, 1);
+        }
     }
 
     property_list_t *proplist = ro->baseProperties;
@@ -8185,7 +8187,7 @@ id
 object_dispose(id obj)
 {
     if (!obj) return nil;
-
+    // 1，调用析构函数，2，清除关联对象，3，weak引用置空，4，删除额外的引用表，
     objc_destructInstance(obj);    
     free(obj);
 

@@ -104,7 +104,7 @@
 		83F4B52915E843B100E0926F /* NSObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 83F4B52715E843B100E0926F /* NSObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83F550E0155E030800E95D3B /* objc-cache-old.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83F550DF155E030800E95D3B /* objc-cache-old.mm */; };
 		87BB4EA70EC39854005D08E1 /* objc-probes.d in Sources */ = {isa = PBXBuildFile; fileRef = 87BB4E900EC39633005D08E1 /* objc-probes.d */; };
-		9672F7EE14D5F488007CEC96 /* NSObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9672F7ED14D5F488007CEC96 /* NSObject.mm */; };
+		937F9C0B27F4608C0007E490 /* NSObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9672F7ED14D5F488007CEC96 /* NSObject.mm */; };
 		E8923DA5116AB2820071B552 /* objc-block-trampolines.mm in Sources */ = {isa = PBXBuildFile; fileRef = E8923DA0116AB2820071B552 /* objc-block-trampolines.mm */; };
 /* End PBXBuildFile section */
 
@@ -619,7 +619,6 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = NO;
 				LastUpgradeCheck = 0440;
 				TargetAttributes = {
 					7AF76778220C299900D3CB66 = {
@@ -697,6 +696,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				838485C00D6D687300CEA253 /* hashtable2.mm in Sources */,
+				937F9C0B27F4608C0007E490 /* NSObject.mm in Sources */,
 				838485C40D6D687300CEA253 /* maptable.mm in Sources */,
 				838485F10D6D68A200CEA253 /* objc-auto.mm in Sources */,
 				838485F20D6D68A200CEA253 /* objc-cache.mm in Sources */,
@@ -733,7 +733,6 @@
 				83EB007B121C9EC200B92C16 /* objc-sel-table.s in Sources */,
 				39ABD72412F0B61800D1054C /* objc-weak.mm in Sources */,
 				83D49E4F13C7C84F0057F1DD /* objc-msg-arm64.s in Sources */,
-				9672F7EE14D5F488007CEC96 /* NSObject.mm in Sources */,
 				83725F4A14CA5BFA0014370E /* objc-opt.mm in Sources */,
 				83F550E0155E030800E95D3B /* objc-cache-old.mm in Sources */,
 				834DF8B715993EE1002F2BC9 /* objc-sel-old.mm in Sources */,

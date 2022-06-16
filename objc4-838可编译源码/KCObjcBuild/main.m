@@ -19,41 +19,94 @@
 #import "FGModel.h"
 #import "FGModel+Tool.h"
 
+// nlclslist是有+load方法的类
+// catlist是有类别的类
+// nlcatlist是有+load的类别
+
+extern void
+instrumentObjcMessageSends(BOOL flag);
+
+// CLANG_OPTIMIZATION_PROFILE_FILE
+// $(SRCROOT)/OptimizationProfiles/$(PROJECT_NAME).profdata
 
 void testBit(void);
+void testWeak(void);
+void testAssociation(void);
+void testAutoRelease(void);
+void testSynchronize(void);
 
+#define FGKeyPath(KEYPATH) \
+@((((void)KEYPATH), \
+({ const char *path = strchr(#KEYPATH, '.'); path + 1; })))
+
+#define FBKVOKeyPath(KEYPATH) \
+@(((void)(NO && ((void)KEYPATH, NO)), \
+({ const char *fbkvokeypath = strchr(#KEYPATH, '.'); fbkvokeypath + 1; })))
 
 int main(int argc, const char * argv[]) {
-    testBit();
-
-    @autoreleasepool {
-        NSLog(@"Hello, KCObjcBuild!");
-        NSObject *objc = [[NSObject alloc] init];
-        [objc class];
-        
-        FGModel *model = [[FGModel alloc] init];
-        objc.obj = model;
-        
-        FGModel *model2 = [[FGModel alloc] init];
-        objc.obj = model2;
-
-        FGModel *model3 = objc.obj;
-//        objc.obj = nil;
-        
-        __weak typeof(model) wmodel = model;//objc_initWeak
-        [model something];
-        Class cls = object_getClass(model);
-        //0x0000000ffffffff8ULL
-        // 0x0001 0111 0000 0011 1101 1000 0111 0111
-        NSLog(@"开心调试 %@ 底层源码",objc);
-    }
+    testSynchronize();
+//    testBit();
+//    testAssociation();
+//    testWeak();
+//    testAutoRelease();
+//
+//    @autoreleasepool {
+//        NSLog(@"Hello, KCObjcBuild!");
+//    }
     
     // 1 0000 0000 0000 0000 1000 0000 1100 1000
     // 0x1000080c8
     return 0;
 }
 
+void testWeak(void) {
+    FGModel *model = [[FGModel alloc] init];
+    FGModel *model2 = [[FGModel alloc] init];
 
+    // 增加一个weak
+    __weak typeof(model) wmodel1 = model;//只要是初次赋值objc_initWeak
+    wmodel1 = nil;// 只要再次赋值，就是objc_storeWeak
+    // 增加一个weak
+    __weak typeof(model) wmodel2 = model;//objc_initWeak
+    
+    __weak typeof(model) wmodel3 = model;//objc_initWeak
+
+    __weak typeof(model) wmodel4 = model;//objc_initWeak
+
+    __weak typeof(model) wmodel5 = model;//objc_initWeak
+    
+    model = nil;
+
+    wmodel1 = nil;
+    
+    wmodel2 = nil;
+}
+
+void testAssociation(void) {
+    NSObject *objc = [[NSObject alloc] init];
+    [objc class];
+    
+    FGModel *model = [[FGModel alloc] init];
+    objc.obj = model;
+    
+    FGModel *model2 = [[FGModel alloc] init];
+    objc.obj = model2;
+
+    FGModel *model3 = objc.obj;
+//        objc.obj = nil;
+}
+
+void testAutoRelease(void) {
+    printPool();
+    FGModel *model = [[FGModel alloc] init];
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [model testAuto];
+    });
+    printPool();
+//    while (1) {
+//        
+//    }
+}
 
 struct Student {
     uintptr_t a:1;// 低位，放在低地址
@@ -81,4 +134,40 @@ void testBit(void) {
     
     printf("%p",&stu);
     //stu的值: 9f 0a
+}
+
+void testSynchronize(void) {
+    FGModel *model = [[FGModel alloc] init];
+    [model testSyn];
+    
+//    @synchronized (model) {
+//        NSLog(@"fine1");
+//        @synchronized (model) {
+//            NSLog(@"fine2");
+//        }
+//        [NSThread callStackSymbols];
+//    }
+//
+//    @synchronized (model) {
+//
+//    }
+//    
+//    dispatch_queue_t queue = dispatch_queue_create("fgqueue", DISPATCH_QUEUE_CONCURRENT);
+//    dispatch_set_target_queue(queue, dispatch_get_global_queue(0, 0));
+//    
+////    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), queue, ^{
+//        @synchronized (model) {
+//            dispatch_sync(queue, ^{
+//                @synchronized (model) {
+//                    [model testAuto];
+//                }
+//            });
+//        }
+////    });
+    
+    
+    
+//    while (1) {
+//        
+//    }
 }

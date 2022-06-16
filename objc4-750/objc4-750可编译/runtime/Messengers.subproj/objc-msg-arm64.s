@@ -238,7 +238,7 @@ LExit$0:
 #endif
 	and	w12, w1, w11		// x12 = _cmd & mask
 	add	p12, p10, p12, LSL #(1+PTRSHIFT)
-		             // p12 = buckets + ((_cmd & mask) << (1+PTRSHIFT))
+		             // p12 = buckets + ((_cmd & mask) << (1+PTRSHIFT)) // << (1+3)
 
 	ldp	p17, p9, [x12]		// {imp, sel} = *bucket
 1:	cmp	p9, p1			// if (bucket->sel != _cmd)
@@ -249,13 +249,15 @@ LExit$0:
 	CheckMiss $0			// miss if bucket->sel == 0
 	cmp	p12, p10		// wrap if bucket == buckets
 	b.eq	3f
+                        // 当前的bucket是第一个，则跳转到下面的3处
 	ldp	p17, p9, [x12, #-BUCKET_SIZE]!	// {imp, sel} = *--bucket
+                                        // 这里是向头部查找，每一个bucket占16个字节，BUCKET_SIZE=16
 	b	1b			// loop
 
 3:	// wrap: p12 = first bucket, w11 = mask
 	add	p12, p12, w11, UXTW #(1+PTRSHIFT)
 		                        // p12 = buckets + (mask << 1+PTRSHIFT)
-
+                                // p12此刻就是尾部了，然后从尾部向头部查找
 	// Clone scanning loop to miss instead of hang when cache is corrupt.
 	// The slow path may detect any corruption and halt later.
 

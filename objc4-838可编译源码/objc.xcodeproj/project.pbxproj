@@ -146,8 +146,8 @@
 		83F4B52915E843B100E0926F /* NSObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 83F4B52715E843B100E0926F /* NSObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		83F550E0155E030800E95D3B /* objc-cache-old.mm in Sources */ = {isa = PBXBuildFile; fileRef = 83F550DF155E030800E95D3B /* objc-cache-old.mm */; };
 		87BB4EA70EC39854005D08E1 /* objc-probes.d in Sources */ = {isa = PBXBuildFile; fileRef = 87BB4E900EC39633005D08E1 /* objc-probes.d */; };
-		9336ED6627E8797C00BA870D /* FGModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9336ED6527E8797C00BA870D /* FGModel.m */; };
 		937F44A027EB221A006E0557 /* FGModel+Tool.m in Sources */ = {isa = PBXBuildFile; fileRef = 937F449F27EB221A006E0557 /* FGModel+Tool.m */; };
+		937F44A627EC5855006E0557 /* FGModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 937F44A527EC5855006E0557 /* FGModel.m */; };
 		9672F7EE14D5F488007CEC96 /* NSObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9672F7ED14D5F488007CEC96 /* NSObject.mm */; };
 		C22F5208230EF38B001BFE14 /* objc-ptrauth.h in Headers */ = {isa = PBXBuildFile; fileRef = C22F5207230EF38B001BFE14 /* objc-ptrauth.h */; };
 		C269791A2645D7AE009C19E3 /* NSObject-private.h in Headers */ = {isa = PBXBuildFile; fileRef = C26979192645D7AE009C19E3 /* NSObject-private.h */; };
@@ -333,10 +333,10 @@
 		83F4B52715E843B100E0926F /* NSObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSObject.h; path = runtime/NSObject.h; sourceTree = "<group>"; };
 		83F550DF155E030800E95D3B /* objc-cache-old.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "objc-cache-old.mm"; path = "runtime/objc-cache-old.mm"; sourceTree = "<group>"; };
 		87BB4E900EC39633005D08E1 /* objc-probes.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; name = "objc-probes.d"; path = "runtime/objc-probes.d"; sourceTree = "<group>"; };
-		9336ED6427E8797C00BA870D /* FGModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FGModel.h; sourceTree = "<group>"; };
-		9336ED6527E8797C00BA870D /* FGModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FGModel.m; sourceTree = "<group>"; };
 		937F449E27EB221A006E0557 /* FGModel+Tool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FGModel+Tool.h"; sourceTree = "<group>"; };
 		937F449F27EB221A006E0557 /* FGModel+Tool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "FGModel+Tool.m"; sourceTree = "<group>"; };
+		937F44A427EC5855006E0557 /* FGModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FGModel.h; sourceTree = "<group>"; };
+		937F44A527EC5855006E0557 /* FGModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FGModel.m; sourceTree = "<group>"; };
 		9672F7ED14D5F488007CEC96 /* NSObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NSObject.mm; path = runtime/NSObject.mm; sourceTree = "<group>"; };
 		BC8B5D1212D3D48100C78A5B /* libauto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libauto.dylib; path = /usr/lib/libauto.dylib; sourceTree = "<absolute>"; };
 		C217B55222DE556D004369BA /* objc-env.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "objc-env.h"; path = "runtime/objc-env.h"; sourceTree = "<group>"; };
@@ -394,8 +394,8 @@
 			isa = PBXGroup;
 			children = (
 				04A8FF4F27C7CBA7002F0027 /* main.m */,
-				9336ED6427E8797C00BA870D /* FGModel.h */,
-				9336ED6527E8797C00BA870D /* FGModel.m */,
+				937F44A427EC5855006E0557 /* FGModel.h */,
+				937F44A527EC5855006E0557 /* FGModel.m */,
 				937F449E27EB221A006E0557 /* FGModel+Tool.h */,
 				937F449F27EB221A006E0557 /* FGModel+Tool.m */,
 			);
@@ -881,8 +881,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				937F44A027EB221A006E0557 /* FGModel+Tool.m in Sources */,
-				9336ED6627E8797C00BA870D /* FGModel.m in Sources */,
 				04A8FF5027C7CBA7002F0027 /* main.m in Sources */,
+				937F44A627EC5855006E0557 /* FGModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -994,6 +994,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_OPTIMIZATION_PROFILE_FILE = "";
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1035,6 +1036,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1055,6 +1057,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_OPTIMIZATION_PROFILE_FILE = "";
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
@@ -1090,6 +1093,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				LLVM_LTO = YES;
 				MACOSX_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;

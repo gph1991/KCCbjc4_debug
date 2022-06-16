@@ -212,7 +212,7 @@ static SyncData* id2data(id object, enum usage why)
                 goto done;
             }
             if ( (firstUnused == NULL) && (p->threadCount == 0) )
-                firstUnused = p;
+                firstUnused = p;// 从列表中找到一个空的
         }
     
         // no SyncData currently associated with object

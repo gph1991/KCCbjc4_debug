@@ -111,6 +111,7 @@ static void grow_refs_and_insert(weak_entry_t *entry,
  */
 static void append_referrer(weak_entry_t *entry, objc_object **new_referrer)
 {
+    // 将引用者插入到entry中去
     if (! entry->out_of_line()) {
         // Try to insert inline.
         for (size_t i = 0; i < WEAK_INLINE_COUNT; i++) {
@@ -137,6 +138,7 @@ static void append_referrer(weak_entry_t *entry, objc_object **new_referrer)
 
     ASSERT(entry->out_of_line());
 
+    // 如果空间不足，则扩展
     if (entry->num_refs >= TABLE_SIZE(entry) * 3/4) {
         return grow_refs_and_insert(entry, new_referrer);
     }
@@ -216,9 +218,16 @@ static void weak_entry_insert(weak_table_t *weak_table, weak_entry_t *new_entry)
     size_t begin = hash_pointer(new_entry->referent) & (weak_table->mask);
     size_t index = begin;
     size_t hash_displacement = 0;
+    
+    /*
+     把weak_entry_t插入到weak_table_t中去
+     weak_table是用被引用对象到hash得来的，可能存hash碰撞。其weak_entries某个里面存放着所有hash一样的被引用对象,
+     所以用referent再判断一下，为nil就存到里面
+     
+     */
     while (weak_entries[index].referent != nil) {
         index = (index+1) & weak_table->mask;
-        if (index == begin) bad_weak_table(weak_entries);
+        if (index == begin) bad_weak_table(weak_entries);// 循环了一轮还没有找到空的位置来插入，则bad_weak_table
         hash_displacement++;
     }
 
@@ -286,7 +295,7 @@ static void weak_compact_maybe(weak_table_t *weak_table)
 static void weak_entry_remove(weak_table_t *weak_table, weak_entry_t *entry)
 {
     // remove entry
-    if (entry->out_of_line()) free(entry->referrers);
+    if (entry->out_of_line()) free(entry->referrers);// out_of_line为YES，则表示曾经满过（则会使用referrers存指）
     bzero(entry, sizeof(*entry));
 
     weak_table->num_entries--;
@@ -354,15 +363,15 @@ weak_unregister_no_lock(weak_table_t *weak_table, id referent_id,
     weak_entry_t *entry;
 
     if (!referent) return;
-
+    // 从weak table中查找对应的weak entry
     if ((entry = weak_entry_for_referent(weak_table, referent))) {
         remove_referrer(entry, referrer);
         bool empty = true;
         if (entry->out_of_line()  &&  entry->num_refs != 0) {
-            empty = false;
+            empty = false;// 判断堆上有没有
         }
         else {
-            for (size_t i = 0; i < WEAK_INLINE_COUNT; i++) {
+            for (size_t i = 0; i < WEAK_INLINE_COUNT; i++) {// 判断栈上有没有
                 if (entry->inline_referrers[i]) {
                     empty = false; 
                     break;
