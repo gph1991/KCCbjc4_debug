@@ -886,6 +886,7 @@ private:
             // autoreleased more objects
             AutoreleasePoolPage *page = hotPage();
 
+            // 如果当前的已经释放完了，还没有到token的位置，向上追溯
             // fixme I think this `while` can be `if`, but I can't prove it
             while (page->empty()) {
                 page = page->parent;
@@ -1220,6 +1221,7 @@ public:
             // Popping the top-level placeholder pool.
             page = hotPage();
             if (!page) {
+                // 表明 @autorealeasepool{}里面没有任何的autorelease对象
                 // Pool was never used. Clear the placeholder.
                 return setHotPage(nil);
             }
@@ -1227,7 +1229,9 @@ public:
             // Pool pages remain allocated for re-use as usual.
             page = coldPage();
             token = page->begin();
+            // token PLACEHOLDER是初次push的返回值，所以要释放掉所有的对象，page要上溯到首个
         } else {
+            // 其他时候token都是POOL_BOUNDARY，需要在对应的page中释放掉对象
             page = pageForPointer(token);
         }
 

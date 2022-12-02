@@ -187,6 +187,7 @@ _object_set_associative_reference(id object, const void *key, id value, uintptr_
             /* establish or replace the association */
             auto &refs = refs_result.first->second;
             auto result = refs.try_emplace(key, std::move(association));
+            // try_emplace后，association里面的值就为空了
             if (!result.second) {// 为false则表明key对应的存在，否则不存在,result.first->first是key，result.first->second是ObjcAssociation
                 association.swap(result.first->second);
             }

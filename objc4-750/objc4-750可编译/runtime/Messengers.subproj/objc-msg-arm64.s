@@ -270,6 +270,7 @@ LExit$0:
 	CheckMiss $0			// miss if bucket->sel == 0
 	cmp	p12, p10		// wrap if bucket == buckets
 	b.eq	3f
+                        // 再一次和头部相同，查找结束，没有找到
 	ldp	p17, p9, [x12, #-BUCKET_SIZE]!	// {imp, sel} = *--bucket
 	b	1b			// loop
 
@@ -322,11 +323,15 @@ LNilOrTagged:
 	// tagged
 	adrp	x10, _objc_debug_taggedpointer_classes@PAGE
 	add	x10, x10, _objc_debug_taggedpointer_classes@PAGEOFF
+                        // x10 是_objc_debug_taggedpointer_classes
 	ubfx	x11, x0, #60, #4
+                        // 取x0的高4位到x11
 	ldr	x16, [x10, x11, LSL #3]
+                        // 取【x11左移3位加x10】的内容到x16，因为_objc_debug_taggedpointer_classes存储的类型是8字节的。所以左移3位
 	adrp	x10, _OBJC_CLASS_$___NSUnrecognizedTaggedPointer@PAGE
 	add	x10, x10, _OBJC_CLASS_$___NSUnrecognizedTaggedPointer@PAGEOFF
 	cmp	x10, x16
+                        // 与NSUnrecognizedTaggedPointer类进行比较，如果不一样，则去获取isa。否则去取ext信息
 	b.ne	LGetIsaDone
 
 	// ext tagged
