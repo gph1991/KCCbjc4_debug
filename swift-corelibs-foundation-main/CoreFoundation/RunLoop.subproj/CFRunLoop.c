@@ -1725,34 +1725,34 @@ static Boolean __CFRunLoopDoBlocks(CFRunLoopRef rl, CFRunLoopModeRef rlm) { // C
     while (item) {
         struct _block_item *curr = item;
         item = item->_next;
-	Boolean doit = false;
-	if (_kCFRuntimeIDCFString == CFGetTypeID(curr->_mode)) {
-	    doit = CFEqual(curr->_mode, curMode) || (CFEqual(curr->_mode, kCFRunLoopCommonModes) && CFSetContainsValue(commonModes, curMode));
+        Boolean doit = false;
+        if (_kCFRuntimeIDCFString == CFGetTypeID(curr->_mode)) {
+            doit = CFEqual(curr->_mode, curMode) || (CFEqual(curr->_mode, kCFRunLoopCommonModes) && CFSetContainsValue(commonModes, curMode));
         } else {
-	    doit = CFSetContainsValue((CFSetRef)curr->_mode, curMode) || (CFSetContainsValue((CFSetRef)curr->_mode, kCFRunLoopCommonModes) && CFSetContainsValue(commonModes, curMode));
-	}
-	if (!doit) prev = curr;
-	if (doit) {
-	    if (prev) prev->_next = item;
-	    if (curr == head) head = item;
-	    if (curr == tail) tail = prev;
-	    void (^block)(void) = curr->_block;
+            doit = CFSetContainsValue((CFSetRef)curr->_mode, curMode) || (CFSetContainsValue((CFSetRef)curr->_mode, kCFRunLoopCommonModes) && CFSetContainsValue(commonModes, curMode));
+        }
+        if (!doit) prev = curr;
+        if (doit) {
+            if (prev) prev->_next = item;
+            if (curr == head) head = item;
+            if (curr == tail) tail = prev;
+            void (^block)(void) = curr->_block;
             CFRelease(curr->_mode);
             free(curr);
-	    if (doit) {
+            if (doit) {
                 cf_trace(KDEBUG_EVENT_CFRL_IS_CALLING_BLOCK | DBG_FUNC_START, rl, rlm, block, 0);
                 __CFRUNLOOP_IS_CALLING_OUT_TO_A_BLOCK__(block);
                 cf_trace(KDEBUG_EVENT_CFRL_IS_CALLING_BLOCK | DBG_FUNC_END, rl, rlm, block, 0);
-	        did = true;
-	    }
+                did = true;
+            }
             Block_release(block); // do this before relocking to prevent deadlocks where some yahoo wants to run the run loop reentrantly from their dealloc
-	}
+        }
     }
     __CFRunLoopLock(rl);
     __CFRunLoopModeLock(rlm);
     if (head && tail) {
-	tail->_next = rl->_blocks_head;
-	rl->_blocks_head = head;
+        tail->_next = rl->_blocks_head;
+        rl->_blocks_head = head;
         if (!rl->_blocks_tail) rl->_blocks_tail = tail;
     }
     
@@ -2400,7 +2400,7 @@ static Boolean __CFRunLoopServiceMachPort(mach_port_name_t port, mach_msg_header
         CFRUNLOOP_WAKEUP(ret);
         cf_trace(KDEBUG_EVENT_CFRL_DID_WAKEUP, port, 0, 0, 0);
         if (MACH_MSG_SUCCESS == ret) {
-            *livePort = msg ? msg->msgh_local_port : MACH_PORT_NULL;
+            *livePort = msg ? msg->msgh_local_port : MACH_PORT_NULL;// 接收的端口
             return true;
         }
         if (MACH_RCV_TIMED_OUT == ret) {
@@ -2694,7 +2694,7 @@ static int32_t __CFRunLoopRun(CFRunLoopRef rl, CFRunLoopModeRef rlm, CFTimeInter
         if (MACH_PORT_NULL != dispatchPort && !didDispatchPortLastTime) {
 #if TARGET_OS_MAC
             msg = (mach_msg_header_t *)msg_buffer;
-            // 看dispatchPort 是否有消息，只有主线程才会有dispatchPort
+            // 看dispatchPort 是否有消息，只有主线程才会有dispatchPort，只处理main_queue的block，超时时间为0
             if (__CFRunLoopServiceMachPort(dispatchPort, &msg, sizeof(msg_buffer), &livePort, 0, &voucherState, NULL, rl, rlm)) {
                 goto handle_msg;
             }
@@ -2724,7 +2724,8 @@ static int32_t __CFRunLoopRun(CFRunLoopRef rl, CFRunLoopModeRef rlm, CFTimeInter
 #if USE_DISPATCH_SOURCE_FOR_TIMERS
         do {
             msg = (mach_msg_header_t *)msg_buffer;
-            // waitSet包含了timer port，runloop的wakeup port（在addTimer时加入），某些时候还有dispatchPort
+            // waitSet包含了timer port，queue port,runloop的wakeUpPort（__CFRunLoopFindMode创建时），某些时候还有dispatchPort
+            // 处理了source0，超时时间就为0，否则就一直等待
             __CFRunLoopServiceMachPort(waitSet, &msg, sizeof(msg_buffer), &livePort, poll ? 0 : TIMEOUT_INFINITY, &voucherState, &voucherCopy, rl, rlm);
             
             if (modeQueuePort != MACH_PORT_NULL && livePort == modeQueuePort) {
@@ -3657,7 +3658,7 @@ CFRunLoopSourceRef CFRunLoopSourceCreate(CFAllocatorRef allocator, CFIndex order
     size = sizeof(struct __CFRunLoopSource) - sizeof(CFRuntimeBase);
     memory = (CFRunLoopSourceRef)_CFRuntimeCreateInstance(allocator, CFRunLoopSourceGetTypeID(), size, NULL);
     if (NULL == memory) {
-	return NULL;
+        return NULL;
     }
     __CFSetValid(memory);
     __CFRunLoopSourceUnsetSignaled(memory);
@@ -3665,16 +3666,16 @@ CFRunLoopSourceRef CFRunLoopSourceCreate(CFAllocatorRef allocator, CFIndex order
     memory->_order = order;
     size = 0;
     switch (context->version) {
-    case 0:
-	size = sizeof(CFRunLoopSourceContext);
-	break;
-    case 1:
-	size = sizeof(CFRunLoopSourceContext1);
-	break;
+        case 0:
+            size = sizeof(CFRunLoopSourceContext);
+            break;
+        case 1:
+            size = sizeof(CFRunLoopSourceContext1);
+            break;
     }
     memmove(&memory->_context, context, size);
     if (context->retain) {
-	memory->_context.version0.info = (void *)context->retain(context->info);
+        memory->_context.version0.info = (void *)context->retain(context->info);
     }
     return memory;
 }

@@ -349,7 +349,22 @@ func display(_ options: Options) -> Int32 {
 }
 
 func main() -> Int32 {
-    let timer:Timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { (timer) in
+    
+    DispatchQueue.main.async {
+        print("main async")
+    }
+    
+    RunLoop.current.perform {
+        print("perform block1")
+    }
+    
+    RunLoop.current.perform {
+        print("perform block2")
+    }
+    
+    
+    
+    let timer:Timer = Timer.scheduledTimer(withTimeInterval: 50, repeats: true) { (timer) in
         print("timer fire")
     }
     RunLoop.current.run()
